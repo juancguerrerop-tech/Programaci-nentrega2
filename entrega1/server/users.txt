@@ -1,0 +1,25 @@
+{"name": "Alexander", "id": "787878", "role": "professor", "password": "professor_pass"}
+{"name": "Helena", "id": "99999", "role": "student", "password": "student_pass"}
+{"name": "Ana", "id": "9975901", "role": "professor", "password": "clave_prof"}
+{"name": "Luis", "id": "9975902", "role": "professor", "password": "clave_prof2"}
+{"name": "Eva", "id": "9975903", "role": "student", "password": "clave_est"}
+{"name": "Leo", "id": "9975904", "role": "student", "password": "clave_est2"}
+{"name": "Ana", "id": "9975091", "role": "professor", "password": "clave_prof"}
+{"name": "Luis", "id": "9975092", "role": "professor", "password": "clave_prof2"}
+{"name": "Eva", "id": "9975093", "role": "student", "password": "clave_est"}
+{"name": "Leo", "id": "9975094", "role": "student", "password": "clave_est2"}
+{"name": "camilo", "id": "1086223186", "role": "student", "password": "1118"}
+{"name": "Julian", "id": "7979", "role": "professor", "password": "professor_pass"}
+{"name": "natalia", "id": "9888889", "role": "student", "password": "student_pass"}
+{"name": "juan camilo", "id": "1234", "role": "Estudiante", "password": "123456"}
+{"name": "dhdf", "id": "4751", "role": "student", "password": "8941"}
+{"name": "jhdff", "id": "564981", "role": "professor", "password": "98491"}
+{"name": "Juan", "id": "123", "role": "student", "password": "789"}
+{"name": "David", "id": "456", "role": "professor", "password": "123"}
+{"name": "Juan", "id": "123", "role": "student", "password": "789"}
+{"name": "David", "id": "111", "role": "student", "password": "222"}
+{"name": "David", "id": "111", "role": "student", "password": "222"}
+{"name": "Julio", "id": "222", "role": "professor", "password": "333"}
+{"name": "Julio", "id": "222", "role": "professor", "password": "333"}
+{"name": "jasdkjashd", "id": "784512", "role": "student", "password": "/784521"}
+{"name": "Juan", "id": "123", "role": "student", "password": "789"}
