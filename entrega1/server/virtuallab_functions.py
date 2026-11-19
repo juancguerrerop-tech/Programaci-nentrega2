@@ -244,20 +244,28 @@ def listStudents(id):
 
 # Función para asignar una práctica de laboratorio a un estudiante
 def assignLab(id, lab_name, student_id):
+    # Si llega con el prefijo 'UNASSIGN_', redirige a la función que elimina la asignación
+    if str(lab_name).startswith("UNASSIGN_"):
+        return unassignLab(id, str(lab_name)[len("UNASSIGN_"):], student_id)
+
+    # Si llega con la clave 'LIST_ASSIGNED', devuelve los laboratorios asignados a ese estudiante
+    if str(lab_name) == "LIST_ASSIGNED":
+        return listAssignedLabsForProfessor(id, student_id)
+
     response = "error"
 
-    # El usuario debe ser un profesor con sesión abierta
+    # Caso 1: El usuario debe ser un profesor con sesión abierta
     if not hasRoleAndSession(id, "professor"):
         print(response)
         return response
 
-    # Verificar que el estudiante exista y tenga el rol correcto
+    # Caso 2: Verificar que el estudiante exista y tenga el rol correcto
     student = getUser(student_id)
     if student is None or student["role"] != "student":
         print(response)
         return response
 
-    # Verificar que el laboratorio exista
+    # Caso 3: Verificar que el laboratorio exista en server/labs
     file_name = labFileName(lab_name)
     lab_path = os.path.join(labsDir, file_name)
 
@@ -265,7 +273,7 @@ def assignLab(id, lab_name, student_id):
         print(response)
         return response
 
-    # Evitar asignar el mismo laboratorio dos veces al mismo estudiante
+    # Caso 4: Evitar asignar el mismo laboratorio dos veces al mismo estudiante
     assignments = readAssignments()
 
     for assignment in assignments:
@@ -274,16 +282,87 @@ def assignLab(id, lab_name, student_id):
         
         if s_id is not None and l_name is not None:
             if str(s_id) == str(student_id) and l_name == file_name:
-                response = f"Lab {file_name} was succesfully assigned to student {student_id}"
+                response = f"Lab {file_name} is already assigned to student {student_id}"
                 print(response)
                 return response
 
-    # Guardar usando el formato plano nativo del profesor (estudiante:laboratorio)
+    # Caso 5: Guardar la nueva asignación usando el formato plano (estudiante:laboratorio)
     os.makedirs(os.path.dirname(assignmentsFile), exist_ok=True)
 
     with open(assignmentsFile, "a", encoding="utf-8") as file:
         file.write(f"{student_id}:{file_name}\n")
 
     response = f"Lab {file_name} was succesfully assigned to student {student_id}"
+    print(response)
+    return response
+
+# Función para quitar una práctica de laboratorio previamente asignada a un estudiante
+def unassignLab(id, lab_name, student_id):
+    response = "error"
+
+    # Caso 1: Verificar que quien solicita sea un profesor con sesión abierta
+    if not hasRoleAndSession(id, "professor"):
+        print(response)
+        return response
+
+    # Caso 2: Verificar que el estudiante exista y tenga el rol 'student'
+    student = getUser(student_id)
+    if student is None or student["role"] != "student":
+        print(response)
+        return response
+
+    # Normalizar nombre del archivo (.zip) y leer todas las asignaciones actuales
+    file_name = labFileName(lab_name)
+    assignments = readAssignments()
+
+    # Filtrar la lista dejando por fuera únicamente la coincidencia (student_id + file_name)
+    nuevas_asignaciones = [
+        a for a in assignments
+        if not (str(a.get("student_id")) == str(student_id) and a.get("lab") == file_name)
+    ]
+
+    # Caso 3: Si la lista mantiene el mismo tamaño, ese laboratorio no estaba asignado
+    if len(nuevas_asignaciones) == len(assignments):
+        response = f"Lab {file_name} is not assigned to student {student_id}"
+        print(response)
+        return response
+
+    # Caso 4: Reescribir assignments.txt sin la asignación eliminada y confirmar éxito
+    os.makedirs(os.path.dirname(assignmentsFile), exist_ok=True)
+    with open(assignmentsFile, "w", encoding="utf-8") as file:
+        for a in nuevas_asignaciones:
+            file.write(f"{a['student_id']}:{a['lab']}\n")
+
+    response = f"Lab {file_name} was succesfully unassigned from student {student_id}"
+    print(response)
+    return response
+
+# Función auxiliar para que el profesor consulte qué laboratorios tiene asignados un estudiante
+def listAssignedLabsForProfessor(id, student_id):
+    # Caso 1: Verificar que quien consulta sea un profesor con sesión abierta
+    if not hasRoleAndSession(id, "professor"):
+        response = "error"
+        print(response)
+        return response
+
+    # Caso 2: Verificar que el estudiante exista y tenga el rol 'student'
+    student = getUser(student_id)
+    if student is None or student["role"] != "student":
+        response = "error"
+        print(response)
+        return response
+
+    # Caso 3: Recopilar y devolver en JSON los laboratorios asignados a ese estudiante
+    labs = []
+    seen = set()
+    for assignment in readAssignments():
+        s_id = assignment.get("student_id")
+        l_name = assignment.get("lab")
+        if s_id is not None and l_name is not None:
+            if str(s_id) == str(student_id) and l_name not in seen:
+                labs.append(l_name)
+                seen.add(l_name)
+
+    response = dumps(labs)
     print(response)
     return response
